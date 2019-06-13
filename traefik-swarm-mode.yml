@@ -4,27 +4,37 @@ services:
   traefik:
     image: traefik:latest
     command: 
+      #- "storeconfig" #This is the push to consul
+      - "--logLevel=WARN"
       - "--api"
-      - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
-      - "--entrypoints=Name:https Address::443 TLS TLS.SniStrict:true TLS.MinVersion:VersionTLS12"
-      - "--acme"
       - "--defaultentrypoints=http,https"
+      - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
+      - "--entrypoints=Name:https Address::443 TLS TLS.SniStrict:true TLS.MinVersion:VersionTLS12 CipherSuites:TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256"
+      - "--acme"
       - "--acme.storage=/etc/traefik/acme/acme.json"
       - "--acme.entryPoint=https"
-      - "--acme.httpChallenge.entryPoint=http"
+      - "--acme.dnsChallenge=true"
+      - "--acme.dnsChallenge.provider=godaddy"
+      - "--acme.dnsChallenge.delayBeforeCheck=60"
       - "--acme.onHostRule=true"
       - "--acme.email=user@example.com"
+      - "--acme.acmeLogging=true"
       - "--docker"
       - "--docker.swarmMode"
-      - "--docker.domain=docker.lan"
+      - "--docker.domain=domain.tld"
       - "--docker.watch"
+      - "--docker.exposedbydefault=false"
+      - "--consul"
+      - "--consul.endpoint=consul:8500"
+      - "--consul.prefix=traefik"
+      - "--retry"
     environment:
       TZ: America/New_York
 #      CLOUDFLARE_EMAIL: user@example.com
 #      CLOUDFLARE_API_KEY: gdfgdfsgdfg
       GODADDY_API_SECRET: sdfsdfsdfsdf
       GODADDY_API_KEY: sdfsdfsdfsdf
-      PROVIDER: godaddy
+#      PROVIDER: godaddy
     ports:
       - target: 80
         published: 80
@@ -36,10 +46,12 @@ services:
         published: 8080
 #        mode: host
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /HAfolder/traefik:/etc/traefik
-      - /HAfolder/docker/shared:/shared
-      - /HAfolder/htpasswd/.htpasswd:/.htpasswd:ro
+#      - /nfs/03cservices/traefik:/etc/traefik
+      - /nfs/03cservices/docker/shared:/shared
+      - /nfs/03cservices/traefik/acme/acme.json:/etc/traefik/acme/acme.json
+      - /data/brick/traefik.log:/traefik.log
     networks:
       - traefik
     deploy:
@@ -57,7 +69,7 @@ services:
         traefik.frontend.headers.customResponseHeaders: X-Robots-Tag:noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
         traefik.frontend.redirect.entryPoint: https
         traefik.frontend.entryPoint: http
-        traefik.frontend.rule: Host:traefik.example.com,
+        traefik.frontend.rule: Host:traefik.domain.tld,
         traefik.port: 8080
         traefik.protocol: http
         traefik.frontend.priority: 1
