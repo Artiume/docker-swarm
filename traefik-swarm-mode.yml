@@ -83,7 +83,7 @@ services:
         traefik.frontend.headers.STSIncludeSubdomains: "true"
         traefik.frontend.headers.STSPreload: "true"
         traefik.frontend.headers.frameDeny: "true"
-        traefik.frontend.headers.customFrameOptionsValue: 'allow-from https://domain.tld'
+        traefik.frontend.headers.customFrameOptionsValue: 'allow-from https:${DOMAINNAME}'
         traefik.frontend.passHostHeader: "true"
         traefik.frontend.headers.SSLForceHost: "true"
         #traefik.frontend.auth.forward.address: http://oauth:418
