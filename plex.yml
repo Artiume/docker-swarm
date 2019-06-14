@@ -1,0 +1,71 @@
+version: '3.7'
+
+services:
+  plexfront:
+    image: linuxserver/plex
+#    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    environment:
+      TZ: America/New_York
+      PLEX_CLAIM: claim-xxx
+      PLEX_UID: 1000
+      PLEX_GID: 1000
+      ADVERTISE_IP: http://192.168.1.51:32402, https://plex.domain.tld
+      HOME: /config
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+#      CHANGE_CONFIG_DIR_OWNERSHIP: 1
+    ports:
+      - "32400:32400/tcp"
+      - "1900:1900/udp"
+      - "3005:3005/tcp"
+      - "32410:32410/udp"
+      - "32412:32412/udp"
+      - "32413:32413/udp"
+      - "32414:32414/udp"
+      - "32469:32469/tcp"
+      - "33400:33400/tcp"
+      - "33443:33443/tcp"
+      - "8324:8324/tcp"
+    volumes:
+      - ${USERDIR}/docker/config:/config
+      - /dev/shm:/transcode
+      - /data:/data:ro
+    networks:
+      - traefik
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.enable: "true"
+        traefik.frontend.headers.customResponseHeaders: X-Robots-Tag:noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
+        traefik.frontend.redirect.entryPoint: https
+        traefik.frontend.entryPoint: http
+        traefik.frontend.rule: Host:plex.domain.tld
+        traefik.port: 32400
+        traefik.protocol: http
+        traefik.frontend.priority: 1
+        traefik.backend: plex
+        traefik.docker.network: traefik
+        traefik.frontend.headers.SSLRedirect: "true"
+        traefik.frontend.headers.STSSeconds: 315360000
+        traefik.frontend.headers.browserXSSFilter: "true"
+#        traefik.frontend.headers.contentTypeNosniff: "true"
+        traefik.frontend.headers.forceSTSHeader: "true"
+        traefik.frontend.headers.SSLHost: domain.tld
+#        traefik.frontend.headers.STSIncludeSubdomains: "true"
+#        traefik.frontend.headers.frameDeny: "true"
+#      placement:
+#        constraints: [node.platform.os == linux]
+#        constraints: [node.labels.plex = plex01]
+#   update_config:
+#      delay: 30s
+      restart_policy:
+        condition: on-failure
+
+
+networks:
+  traefik:
+    driver: overlay
+    attachable: true
+    external: true
+    name: traefik
