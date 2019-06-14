@@ -86,7 +86,8 @@ services:
         traefik.frontend.headers.customFrameOptionsValue: 'allow-from https://domain.tld'
         traefik.frontend.passHostHeader: "true"
         traefik.frontend.headers.SSLForceHost: "true"
-        traefik.frontend.auth.basic.users: xxx:xxx
+        #traefik.frontend.auth.forward.address: http://oauth:418
+        #traefik.frontend.auth.basic.users: xxx:xxx
 ## Unable to chown host storage. consul's id must be matched on host system prior to use.
   consul:
     image: consul
