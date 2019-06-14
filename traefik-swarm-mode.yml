@@ -35,7 +35,7 @@ services:
       - "--retry"
       - "resolvers=[192,168.1.1,1.1.1.1:53,]"
     environment:
-      TZ: {TZ}
+      TZ: ${TZ}
 #      CLOUDFLARE_EMAIL: ${EMAIL}
 #      CLOUDFLARE_API_KEY: ${CFKEY}
       GODADDY_API_SECRET: ${GODADDYSECRET}
