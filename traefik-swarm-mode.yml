@@ -32,6 +32,7 @@ services:
       - "--consul.endpoint=consul:8500"
       - "--consul.prefix=traefik"
       - "--retry"
+      - "resolvers=[1.1.1.1:53,1.0.0.1:53]"
     environment:
       TZ: America/New_York
 #      CLOUDFLARE_EMAIL: user@example.com
