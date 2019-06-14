@@ -1,0 +1,82 @@
+version: '3.7'
+
+services:
+  agent:
+    image: portainer/agent
+    environment:
+     # REQUIRED: Should be equal to the service name prefixed by "tasks." when
+     # deployed inside an overlay network
+      AGENT_CLUSTER_ADDR: tasks.agent
+      AGENT_SECRET: SECRET
+      AGENT_PORT: 9001
+     # LOG_LEVEL: debug
+      TZ: America/New_York
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    networks:
+      - portainer
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.platform.os == linux]
+
+  portainer:
+    image: portainer/portainer
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    environment:
+      AGENT_SECRET: SECRET
+      TZ: ${TZ}
+#    ports:
+#      - "9000:9000"
+    volumes:
+      - ${USERDIR}/portainer:/data
+    networks:
+      - portainer
+      - traefik
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.enable: "true"
+        traefik.frontend.headers.customResponseHeaders: X-Robots-Tag:noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
+        traefik.frontend.redirect.entryPoint: https
+        traefik.port: 9000
+        traefik.frontend.rule: Host:portainer.${DOMAINNAME},
+        traefik.protocol: http
+        traefik.frontend.priority: 1
+        traefik.backend: portainer
+        traefik.docker.network: traefik
+        traefik.frontend.headers.SSLRedirect: "true"
+        traefik.frontend.headers.STSSeconds: 315360000
+        traefik.frontend.headers.browserXSSFilter: "true"
+        traefik.frontend.headers.contentTypeNosniff: "true"
+        traefik.frontend.headers.forceSTSHeader: "true"
+        traefik.frontend.headers.SSLHost: portainer.${DOMAINNAME}
+        traefik.frontend.headers.STSIncludeSubdomains: "true"
+        traefik.frontend.headers.STSPreload: "true"
+        traefik.frontend.entryPoint: http
+        traefik.frontend.headers.frameDeny: "true"
+        traefik.frontend.headers.customFrameOptionsValue: 'allow-from https:${DOMAINNAME}'
+        traefik.frontend.passHostHeader: "true"
+        traefik.frontend.headers.SSLForceHost: "true"
+        #traefik.frontend.auth.forward.address: http://oauth:418
+        #traefik.frontend.auth.basic.users: xxx:xxx
+      update_config:
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+
+networks:
+  portainer:
+    driver: overlay
+    name: portainer
+    external: false
+    attachable: false
+  traefik:
+    driver: overlay
+    name: traefik
+    attachable: true
+    external: true
