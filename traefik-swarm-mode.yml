@@ -119,7 +119,6 @@ volumes:
   consul-data:
       driver: [not local]
 
-
 networks:
   traefik:
     driver: overlay
