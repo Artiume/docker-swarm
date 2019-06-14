@@ -19,9 +19,11 @@ services:
       - "--acme.onHostRule=true"
       - "--acme.email=user@example.com"
       - "--acme.acmeLogging=true"
+      - "--acme.domains.main=${DOMAINNAME}"
+      - "--acme.domains.sans=*.$(DOMAINNAME),"
       - "--docker"
       - "--docker.swarmMode"
-      - "--docker.domain=domain.tld"
+      - "--docker.domain=${DOMAINNAME}"
       - "--docker.watch"
       - "--docker.exposedbydefault=false"
       - "--consul"
@@ -84,7 +86,40 @@ services:
         traefik.frontend.headers.STSIncludeSubdomains: "true"
         traefik.frontend.headers.STSPreload: "true"
         traefik.frontend.headers.frameDeny: "true"
+        traefik.frontend.headers.customFrameOptionsValue: 'allow-from https://domain.tld'
+        traefik.frontend.passHostHeader: 'true'
         traefik.frontend.auth.basic.users: xxx:xxx
+
+  consul:
+    image: consul
+    command: agent -server -bootstrap-expect=1
+    volumes:
+      - consul-data:/consul/data
+    environment:
+      - CONSUL_LOCAL_CONFIG={"datacenter":"us_east2","server":true}
+      - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_INTERFACE=eth0
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+    networks:
+      - traefik
+
+networks:
+  webgateway:
+    driver: overlay
+    external: true
+  traefik:
+    driver: overlay
+
+volumes:
+  consul-data:
+      driver: [not local]
+
 
 networks:
   traefik:
