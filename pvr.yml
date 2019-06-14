@@ -1,0 +1,156 @@
+version: '3.7'
+
+services:
+
+  radarr:
+    image: linuxserver/radarr
+    environment:
+      PUID: 1000
+      PGID: 1000
+      HOME: /config
+      TZ: America/New_York
+#      VIRTUAL_HOST: radarr.domain.tld
+    ports:
+      - "7878:7878/tcp"
+    volumes:
+      - ${USERDIR}/radarr/config:/config
+      - ${USERDIR}/sabnzbd/complete:/complete
+      - ${USERDIR}:/data
+    networks:
+      - traefik
+#    dns:
+#      - 192.168.1.1
+#      - 1.1.1.1
+#      - 1.0.0.1
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.enable: "false"
+        traefik.frontend.headers.customResponseHeaders: X-Robots-Tag:noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
+        traefik.frontend.redirect.entryPoint: https
+        traefik.frontend.rule: Host:sub.domain.tld,
+        traefik.port: 7878
+        traefik.protocol: http
+        traefik.frontend.priority: 1
+        traefik.backend: radarr
+        traefik.docker.network: traefik
+        traefik.frontend.headers.SSLRedirect: "true"
+        traefik.frontend.headers.STSSeconds: 315360000
+        traefik.frontend.headers.browserXSSFilter: "true"
+        traefik.frontend.headers.contentTypeNosniff: "true"
+        traefik.frontend.headers.forceSTSHeader: "true"
+        traefik.frontend.headers.SSLHost: domain.tld
+        traefik.frontend.headers.STSIncludeSubdomains: "true"
+        traefik.frontend.headers.STSPreload: "true"
+        traefik.frontend.headers.frameDeny: "true"
+        traefik.frontend.headers.customFrameOptionsValue: 'allow-from https://domain.tld'
+        traefik.frontend.passHostHeader: 'true'
+#        traefik.frontend.auth.basic.usersFile: /.htpasswd
+      update_config:
+        delay: 30s
+      restart_policy:
+        condition: on-failure
+      placement:
+#        constraints: [node.platform.os == linux]
+
+  sonarr:
+    image: linuxserver/sonarr
+    environment:
+      PUID: 1000
+      PGID: 1000
+      HOME: /config
+      TZ: America/New_York
+#      VIRTUAL_HOST: sonarr.domain.tld
+    ports:
+      - "8989:8989/tcp"
+    volumes:
+      - ${USERDIR}/sonarr/config:/config
+      - ${USERDIR}/sabnzbd/complete:/complete
+      - ${USERDIR}:/data
+    networks:
+      - traefik
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.enable: "false"
+        traefik.frontend.headers.customResponseHeaders: X-Robots-Tag:noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
+        traefik.frontend.redirect.entryPoint: https
+        traefik.frontend.rule: Host:sonarr.domain.tld,
+        traefik.port: 8989
+        traefik.protocol: http
+        traefik.frontend.priority: 1
+        traefik.backend: sonarr
+        traefik.docker.network: traefik
+        traefik.frontend.headers.SSLRedirect: "true"
+        traefik.frontend.headers.STSSeconds: 315360000
+        traefik.frontend.headers.browserXSSFilter: "true"
+        traefik.frontend.headers.contentTypeNosniff: "true"
+        traefik.frontend.headers.forceSTSHeader: "true"
+        traefik.frontend.headers.SSLHost: domain.tld
+        traefik.frontend.headers.STSIncludeSubdomains: "true"
+        traefik.frontend.headers.STSPreload: "true"
+        traefik.frontend.headers.frameDeny: "true"
+        traefik.frontend.headers.customFrameOptionsValue: 'allow-from https://domain.tld'
+        traefik.frontend.passHostHeader: 'true'
+        traefik.frontend.auth.basic.usersFile: /.htpasswd
+      update_config:
+        delay: 30s
+      placement:
+#        constraints: [node.platform.os == linux]
+
+  sabnzbd:
+    image: linuxserver/sabnzbd
+    environment:
+      PUID: 1000
+      PGID: 1000
+      HOME: /config
+      TZ: America/New_York
+    ports:
+      - "8090:8080/tcp"
+      - "9090:9090/tcp"
+    volumes:
+      - ${USERDIR}/sabnzbd/config:/config
+      - ${USERDIR}/sabnzbd/complete:/complete
+      - ${USERDIR}/sabnzbd/incomplete:/incomplete
+      - ${USERDIR}/sabnzbd/nzb:/nzb
+    networks:
+      - traefik
+#    hostname: subdomain.tld
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.enable: "true"
+        traefik.frontend.headers.customResponseHeaders: X-Robots-Tag:noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
+        traefik.frontend.redirect.entryPoint: https
+        traefik.frontend.rule: Host:sabnzbd.domain.tld,
+        traefik.port: 8080
+        traefik.protocol: http
+        traefik.frontend.priority: 1
+        traefik.backend: sabnzbd
+        traefik.docker.network: traefik
+        traefik.frontend.headers.SSLRedirect: "true"
+        traefik.frontend.headers.STSSeconds: 315360000
+        traefik.frontend.headers.browserXSSFilter: "true"
+        traefik.frontend.headers.contentTypeNosniff: "true"
+        traefik.frontend.headers.forceSTSHeader: "true"
+        traefik.frontend.headers.SSLHost: domain.tld
+        traefik.frontend.headers.STSIncludeSubdomains: "true"
+        traefik.frontend.headers.STSPreload: "true"
+        traefik.frontend.headers.frameDeny: "true"
+        traefik.frontend.headers.customFrameOptionsValue: 'allow-from https://domain.tld'
+        traefik.frontend.passHostHeader: 'true'
+        traefik.frontend.auth.basic.usersFile: /.htpasswd
+      update_config:
+        delay: 30s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  traefik:
+    driver: overlay
+    attachable: true
+    external: true
+    name: traefik
