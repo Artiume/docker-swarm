@@ -22,7 +22,7 @@ services:
       - "--acme.onHostRule=true"
       - "--acme.email=user@example.com"
       - "--acme.acmeLogging=true"
-      - "--acme.domains=${DOMAINNAME},*${DOMAINNAME}"
+      - "--acme.domains=${DOMAINNAME},*${DOMAINNAME},"
       - "--acme.KeyType=RSA4096"
       - "--docker"
       - "--docker.swarmMode"
