@@ -4,7 +4,7 @@ services:
   traefik:
     image: traefik:latest
     command: 
-      #- "storeconfig" #This is the push to consul
+      #- "storeconfig" #This is the push to consul, secondary traefik must be created and interfaced to this traefik. Remove this traefik's open ports, it shuts down once consul is messaged.
       - "--logLevel=WARN"
       - "--api"
       - "--api.entrypoint=8080"
@@ -12,8 +12,9 @@ services:
       - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
       - "--entrypoints=Name:https Address::443 TLS TLS.SniStrict:true TLS.MinVersion:VersionTLS12 CipherSuites:TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256"
       - "--acme"
-      - "--acme.storage=/etc/traefik/acme/acme.json"
+      - "--acme.storage=/etc/traefik/acme.json"
       - "--acme.entryPoint=https"
+# not yet ready?
 #      - "--acme.TLS-ALPN-01=true"
       - "--acme.dnsChallenge=true"
       - "--acme.dnsChallenge.provider=godaddy"
@@ -32,7 +33,7 @@ services:
       - "--consul.endpoint=consul:8500"
       - "--consul.prefix=traefik"
       - "--retry"
-      - "resolvers=[1.1.1.1:53,1.0.0.1:53]"
+      - "resolvers=[192,168.1.1,1.1.1.1:53,]"
     environment:
       TZ: America/New_York
 #      CLOUDFLARE_EMAIL: user@example.com
@@ -48,8 +49,8 @@ services:
         published: 8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /nfs/03cservices/traefik/acme/acme.json:/etc/traefik/acme/acme.json
-      - /data/brick/traefik.log:/traefik.log
+      - ${USERDIR}/traefik/acme.json:/etc/traefik/acme/acme.json
+      - ${USERDIR}/traefik/traefik.log:/traefik.log
     networks:
       - traefik
     deploy:
@@ -67,7 +68,7 @@ services:
         traefik.frontend.headers.customResponseHeaders: X-Robots-Tag:noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
         traefik.frontend.redirect.entryPoint: https
         traefik.frontend.entryPoint: http
-        traefik.frontend.rule: Host:traefik.domain.tld,
+        traefik.frontend.rule: Host:traefik.${DOMAINNAME},
         traefik.port: 8080
         traefik.protocol: http
         traefik.frontend.priority: 1
@@ -78,19 +79,20 @@ services:
         traefik.frontend.headers.browserXSSFilter: "true"
         traefik.frontend.headers.contentTypeNosniff: "true"
         traefik.frontend.headers.forceSTSHeader: "true"
-        traefik.frontend.headers.SSLHost: example.com
+        traefik.frontend.headers.SSLHost: traefik.${DOMAINNAME}
         traefik.frontend.headers.STSIncludeSubdomains: "true"
         traefik.frontend.headers.STSPreload: "true"
         traefik.frontend.headers.frameDeny: "true"
         traefik.frontend.headers.customFrameOptionsValue: 'allow-from https://domain.tld'
-        traefik.frontend.passHostHeader: 'true'
+        traefik.frontend.passHostHeader: "true"
+        traefik.frontend.headers.SSLForceHost: "true"
         traefik.frontend.auth.basic.users: xxx:xxx
-
+## Unable to chown host storage. consul's id must be matched on host system prior to use.
   consul:
     image: consul
     command: agent -server -bootstrap-expect=1
     volumes:
-      - consul-data:/consul/data
+      - consul:/consul/data
     environment:
       - CONSUL_LOCAL_CONFIG={"datacenter":"us_east2","server":true}
       - CONSUL_BIND_INTERFACE=eth0
