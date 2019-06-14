@@ -1,0 +1,55 @@
+version: '3.7'
+
+services:
+  oauth:
+    image: thomseddon/traefik-forward-auth
+      TZ: ${TZ}
+      CLIENT_ID: $OAUTHCLIENTID
+      CLIENT_SECRET: $OAUTHCLIENTSECRET
+      SECRET= $OAUTHSECRET # an be anything
+      COOKIE_SECURE=false
+      COOKIE_DOMAINS=${DOMAINNAME}
+      AUTH_HOST=oauth.${DOMAINNAME}
+      WHITELIST= ${EMAIL} # Enter Gmail accounts you want to allow access
+    networks:
+      - traefik
+    deploy:
+      mode: replicated
+      replicas: 1
+#      placement:
+#        constraints: [node.role == manager]
+      update_config:
+        delay: 30s
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+    labels:
+      traefik.enable: "true"
+      traefik.frontend.headers.customResponseHeaders: X-Robots-Tag:noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
+      traefik.frontend.redirect.entryPoint: https
+      traefik.frontend.entryPoint: http
+      traefik.backend: oauth
+      traefik.frontend.rule: Host:oauth.${DOMAINNAME},
+      traefik.port: 4181
+      traefik.docker.network: traefik
+      traefik.frontend.headers.SSLRedirect: "true"
+      traefik.frontend.headers.STSSeconds: 315360000
+      traefik.frontend.headers.browserXSSFilter: true"
+      traefik.frontend.headers.contentTypeNosniff: "true"
+      traefik.frontend.headers.forceSTSHeader: "true"
+      traefik.frontend.headers.SSLHost: oauth.${DOMAINNAME}
+      traefik.frontend.headers.SSLForceHost: "true"
+      traefik.frontend.headers.STSIncludeSubdomains: "true"
+      traefik.frontend.headers.STSPreload: "true"
+      traefik.frontend.headers.frameDeny: "true"
+      traefik.frontend.headers.customFrameOptionsValue: 'allow-from https:${DOMAINNAME}'
+      traefik.frontend.passHostHeader: "true"
+      traefik.frontend.headers.SSLForceHost: "true"
+      traefik.frontend.auth.forward.address: http://oauth:4181" # add this to any containers you want to protect (if possible, sometimes mobile apps dont work)
+
+networks:
+  traefik:
+    driver: overlay
+    attachable: true
+    name: traefik
+    external: false
