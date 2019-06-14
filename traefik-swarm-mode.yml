@@ -35,11 +35,11 @@ services:
       - "--retry"
       - "resolvers=[192,168.1.1,1.1.1.1:53,]"
     environment:
-      TZ: America/New_York
-#      CLOUDFLARE_EMAIL: user@example.com
-#      CLOUDFLARE_API_KEY: gdfgdfsgdfg
-      GODADDY_API_SECRET: sdfsdfsdfsdf
-      GODADDY_API_KEY: sdfsdfsdfsdf
+      TZ: {TZ}
+#      CLOUDFLARE_EMAIL: ${EMAIL}
+#      CLOUDFLARE_API_KEY: ${CFKEY}
+      GODADDY_API_SECRET: ${GODADDYSECRET}
+      GODADDY_API_KEY: ${GODADDYKEY}
     ports:
       - target: 80
         published: 80
@@ -62,7 +62,7 @@ services:
         delay: 30s
       restart_policy:
         condition: on-failure
-        max_attempts: 5
+        max_attempts: 3
       labels:
         traefik.enable: "true"
         traefik.frontend.headers.customResponseHeaders: X-Robots-Tag:noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
