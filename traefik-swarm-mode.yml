@@ -14,6 +14,7 @@ services:
       - "--acme"
       - "--acme.storage=/etc/traefik/acme/acme.json"
       - "--acme.entryPoint=https"
+#      - "--acme.TLS-ALPN-01=true"
       - "--acme.dnsChallenge=true"
       - "--acme.dnsChallenge.provider=godaddy"
       - "--acme.dnsChallenge.delayBeforeCheck=60"
