@@ -13,6 +13,7 @@ Flags:
                                                nameservers.
     --acme.dnschallenge.provider               Use a DNS-01 based challenge provider rather than HTTPS.
     --acme.dnsprovider                         Use a DNS-01 acme challenge rather than TLS-SNI-01 challenge.
+    --acme.TLS-ALPN-01=true
     --acme.domains                             SANs (alternative domains) to each main domain using format:                     (default "[]")
                                                --acme.domains='main.com,san1.com,san2.com'
                                                --acme.domains='main.net,san1.net,san2.net'
