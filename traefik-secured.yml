@@ -49,6 +49,7 @@ services:
       - ${USERDIR}/traefik/traefik.log:/traefik.log
     networks:
       - traefik
+      - external
     deploy:
       mode: replicated
       replicas: 1
@@ -98,14 +99,17 @@ services:
       - "--docker.watch"
       - "--docker.exposedbydefault=false"
       - "--retry"
+      - "--file"
+      - "--file.watch"
       - "resolvers=[192,168.1.1:53,1.1.1.1:53,]"
+    volumes:
+      - ${USERDIR}/frontend-traefik-file.toml:/etc/traefik/file.toml
     ports:
       - target: 80
         published: 80
       - target: 443
         published: 443
     networks:
-      - traefik
       - external
     deploy:
       mode: replicated
