@@ -5,8 +5,9 @@ I have created a default toml-less traefik.yml which has full HSTS capabilities,
 <p align="center">
   <img src="https://github.com/Artiume/docker-swarm/blob/master/A-rating-cert.PNG" width="700"/>
 
-Test your website here! <br>
-https://www.ssllabs.com/ssltest/
+Test your website here!
+<br> https://www.ssllabs.com/ssltest/
+<br> https://www.grc.com/dns/dns.htm
 
 Here's some good information to learn about 
 <br> https://github.com/ssllabs/research/wiki/SSL-and-TLS-Deployment-Best-Practices#25-use-forward-secrecy 
