@@ -8,6 +8,13 @@ I have created a default toml-less traefik.yml which has full HSTS capabilities,
 Test your website here! <br>
 https://www.ssllabs.com/ssltest/
 
+Here's some good information to learn about 
+<br> https://github.com/ssllabs/research/wiki/SSL-and-TLS-Deployment-Best-Practices#25-use-forward-secrecy 
+<br> https://scotthelme.co.uk/https-cheat-sheet/
+<br> https://www.toptenreviews.com/secure-encryption-methods
+
+
+
 I am currently working on creating a frontend and backend traefik which will remove the socket access to the traefik facing the internet.
 
 I want to also get a elevated permissions proxy setup for the system https://github.com/Tecnativa/docker-socket-proxy 
