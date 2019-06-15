@@ -6,3 +6,4 @@ I have created a default traefik.yml which has full HSTS capabilities, dynamic D
 
 I am currently working on creating a frontend and backend traefik which will remove the socket access to the traefik facing the internet.
 
+I want to also get a elevated permissions proxy setup for the system https://github.com/Tecnativa/docker-socket-proxy 
