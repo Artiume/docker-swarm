@@ -9,7 +9,7 @@ services:
       PLEX_CLAIM: claim-xxx
       PLEX_UID: 1000
       PLEX_GID: 1000
-      ADVERTISE_IP: http://192.168.1.51:32402, https://plex.domain.tld
+      ADVERTISE_IP: http://192.168.1.51:32400, https://plex.domain.tld
       HOME: /config
       LANG: en_US.UTF-8
       LC_ALL: en_US.UTF-8
