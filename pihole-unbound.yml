@@ -4,6 +4,7 @@ services:
     domainname: skylarker.org
     image: pihole/pihole:4.1
 #    command:  "--cap-add=NET_ADMIN"
+#cap_add is currently broken in Swarm (So is Depends_on)
     cap_add:
       - NET_ADMIN
     dns:
