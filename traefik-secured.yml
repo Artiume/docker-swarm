@@ -151,7 +151,7 @@ networks:
     name: traefik
     external: false
   external:
-    driver: docker_gwbridge
+    driver: overlay
     attachable: true
     name: external
     external: false
