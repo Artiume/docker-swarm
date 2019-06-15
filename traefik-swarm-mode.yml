@@ -98,8 +98,3 @@ networks:
     attachable: true
     name: traefik
     external: false
-  external:
-    driver: bridge
-    attachable: true
-    name: external
-    external: false
