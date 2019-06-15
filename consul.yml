@@ -1,0 +1,28 @@
+## Unable to chown host storage. consul's id must be matched on host system prior to use.
+  consul:
+    image: consul
+    command: agent -server -bootstrap-expect=1
+    volumes:
+      - consul:/consul/data
+    environment:
+      - CONSUL_LOCAL_CONFIG={"datacenter":"us_east2","server":true}
+      - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_INTERFACE=eth0
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    driver: overlay
+    external: true
+    
+volumes:
+  consul:
+      driver: "not local"
