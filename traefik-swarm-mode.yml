@@ -1,9 +1,5 @@
 version: '3.7'
 
-### Good read on Encryption methods
-### https://scotthelme.co.uk/https-cheat-sheet/
-### https://www.toptenreviews.com/secure-encryption-methods
-
 services:
   traefik:
     image: traefik:latest
