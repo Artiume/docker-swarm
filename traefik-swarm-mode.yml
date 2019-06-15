@@ -32,9 +32,9 @@ services:
       - "--docker.domain=${DOMAINNAME}"
       - "--docker.watch"
       - "--docker.exposedbydefault=false"
-      - "--consul"
-      - "--consul.endpoint=consul:8500"
-      - "--consul.prefix=traefik"
+      #- "--consul"
+      #- "--consul.endpoint=consul:8500"
+      #- "--consul.prefix=traefik"
       - "--retry"
       - "resolvers=[192,168.1.1:53,1.1.1.1:53,]"
     environment:
