@@ -1,0 +1,6 @@
+[backends]
+  [backends.traefik-backend]
+    [backends.traefik-backend.servers]
+     [backends.traefik-backend.servers.server-traefik-backend-ext]
+        url = "http://10.0.0.10:443" 
+		weight = 10
