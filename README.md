@@ -5,6 +5,8 @@ I have created a default toml-less traefik.yml which has full HSTS capabilities,
 <p align="center">
   <img src="https://github.com/Artiume/docker-swarm/blob/master/A-rating-cert.PNG" width="700"/>
 
+Test your website here! <br>
+https://www.ssllabs.com/ssltest/
 
 I am currently working on creating a frontend and backend traefik which will remove the socket access to the traefik facing the internet.
 
