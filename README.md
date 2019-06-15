@@ -1,5 +1,3 @@
-# docker-swarm
-
 My goal is to provide a means of security while having fun.
 
 I have created a default traefik.yml which has full HSTS capabilities, dynamic DNS resolvers (both for traefik itself and for ACME), enhanced security features, and whitelistings to help with compatibility.
