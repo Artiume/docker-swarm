@@ -6,7 +6,7 @@ services:
       TZ: ${TZ}
       CLIENT_ID: $OAUTHCLIENTID
       CLIENT_SECRET: $OAUTHCLIENTSECRET
-      SECRET= $OAUTHSECRET # an be anything
+      SECRET= COOKIESECRET # can be anything
       COOKIE_SECURE=false
       COOKIE_DOMAINS=${DOMAINNAME}
       AUTH_HOST=oauth.${DOMAINNAME}
