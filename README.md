@@ -13,7 +13,7 @@ Here's some good information to learn about
 <br> https://github.com/ssllabs/research/wiki/SSL-and-TLS-Deployment-Best-Practices#25-use-forward-secrecy 
 <br> https://scotthelme.co.uk/https-cheat-sheet/
 <br> https://www.toptenreviews.com/secure-encryption-methods
-
+<br> https://dnsprivacy.org/wiki/display/DP/DNS+Privacy+Project+Homepage
 
 
 I am currently working on creating a frontend and backend traefik which will remove the socket access to the traefik facing the internet.
