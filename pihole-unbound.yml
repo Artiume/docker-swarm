@@ -1,20 +1,18 @@
 version: '3.7'
+
 services:
   pihole:
-    domainname: skylarker.org
-    image: pihole/pihole:4.1
-#    command:  "--cap-add=NET_ADMIN"
-#cap_add is currently broken in Swarm (So is Depends_on)
-    cap_add:
-      - NET_ADMIN
+    domainname: ${DOMAINNAME}
+    image: pihole/pihole:latest
     dns:
-      - 1.1.1.1
       - 127.0.0.1
+      - 192.168.1.1
+      - 1.1.1.1
     ports:
       - '0.0.0.0:53:53/tcp'
       - '0.0.0.0:53:53/udp'
       - '0.0.0.0:67:67/udp'
-      - '0.0.0.0:80:80/tcp'
+#      - '0.0.0.0:80:80/tcp'
     volumes:
 #     run `touch ${USERDIR}/pihole/pihole.log` first unless you like errors
       - ${USERDIR}/pihole/pihole.log:/var/log/pihole.log
@@ -22,11 +20,12 @@ services:
       - ${USERDIR}/pihole/dnsmasq.d:/etc/dnsmasq.d/
     environment:
       ServerIP: 192.168.1.51
+      IPv6=False
       PROXY_LOCATION: pihole
       VIRTUAL_HOST: pihole.${DOMAINNAME}
       VIRTUAL_PORT: 80
       TZ: ${TZ}
-      WEBPASSWORD: "${PIPASSWORD}"
+      WEBPASSWORD: "passsword"
       DNSMASQ_LISTENING: all
       PUID: 1000
       PGID: 1000
@@ -63,10 +62,16 @@ services:
   unbound:
     image: klutchell/unbound:armv7hf
     restart: unless-stopped
+#    ports:
+#      - '0.0.0.0:53:53/tcp'
+#      - '0.0.0.0:53:53/udp'
     networks:
       piholenet:
 #        ipv4_address: 10.0.0.2
-
+   environment:
+      ServerIP: 192.168.1.52
+    volumes:
+      - ${USERDIR}/pihole/unbound:/etc/unbound/unbound.conf.d/pi-hole.conf
 
 networks:
   traefik:
