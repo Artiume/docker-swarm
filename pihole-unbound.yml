@@ -62,9 +62,11 @@ services:
   unbound:
     image: klutchell/unbound:armv7hf
     restart: unless-stopped
-#    ports:
+    ports:
 #      - '0.0.0.0:53:53/tcp'
 #      - '0.0.0.0:53:53/udp'
+      - '0.0.0.0:5353:5353/udp'
+      - '0.0.0.0:5353:5353/tcp'
     networks:
       - piholenet
 #        - ipv4_address: 10.0.0.2
@@ -72,6 +74,14 @@ services:
       ServerIP: 192.168.1.52
     volumes:
       - ${USERDIR}/pihole/unbound/pi-hole.conf:/etc/unbound/unbound.conf.d/pi-hole.conf
+    labels:
+      traefik.enable: "true"
+# https://www.techjunktrunk.com/docker/2017/11/03/traefik-default-server-catch-all/
+      traefik.frontend.rule: HostRegexp:unbound.skylarker.org,
+      traefik.frontend.priority: 1
+      traefik.backend: unbound
+      traefik.port: 5353
+
 
 networks:
   traefik:
