@@ -71,7 +71,7 @@ services:
     environment:
       ServerIP: 192.168.1.52
     volumes:
-      - ${USERDIR}/pihole/unbound:/etc/unbound/unbound.conf.d/pi-hole.conf
+      - ${USERDIR}/pihole/unbound/pi-hole.conf:/etc/unbound/unbound.conf.d/pi-hole.conf
 
 networks:
   traefik:
