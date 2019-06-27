@@ -25,7 +25,7 @@ services:
       VIRTUAL_HOST: pihole.${DOMAINNAME}
       VIRTUAL_PORT: 80
       TZ: ${TZ}
-      WEBPASSWORD: "passsword"
+      WEBPASSWORD: "${PIPASS}"
       DNSMASQ_LISTENING: all
       PUID: 1000
       PGID: 1000
