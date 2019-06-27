@@ -1,0 +1,72 @@
+version: '3.7'
+
+services:
+  pihole:
+    domainname: ${DOMAINNAME}
+    image: pihole/pihole:latest
+    dns:
+      - 127.0.0.1
+      - 192.168.1.1
+      - 1.1.1.1
+    ports:
+      - '0.0.0.0:53:53/tcp'
+      - '0.0.0.0:53:53/udp'
+      - '0.0.0.0:67:67/udp'
+#      - '0.0.0.0:80:80/tcp'
+    volumes:
+#     run `touch ${USERDIR}/pihole/pihole.log` first unless you like errors
+      - ${USERDIR}/pihole/pihole.log:/var/log/pihole.log
+      - ${USERDIR}/pihole/config:/etc/pihole/
+      - ${USERDIR}/pihole/dnsmasq.d:/etc/dnsmasq.d/
+    environment:
+      ServerIP: 192.168.1.51
+      IPv6: 'False'
+      PROXY_LOCATION: pihole
+      VIRTUAL_HOST: pihole.${DOMAINNAME}
+      VIRTUAL_PORT: 80
+      TZ: ${TZ}
+      WEBPASSWORD: "passsword"
+      DNSMASQ_LISTENING: all
+      PUID: 1000
+      PGID: 1000
+    extra_hosts:
+      #   Point any of the jwilder virtual_host addresses
+      # to your docker host ip address
+      - 'pihole.${DOMAINNAME}:192.168.1.51'
+    networks:
+       - traefik
+       - piholenet
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+#Recommended, but not required.
+#      placement:
+#        constraints: [node.role == worker]
+      update_config:
+        parallelism: 1
+        order: stop-first
+        failure_action: rollback
+        monitor: 2m
+        delay: 15s
+      restart_policy:
+        condition: on-failure
+    labels:
+      traefik.enable: "true"
+# https://www.techjunktrunk.com/docker/2017/11/03/traefik-default-server-catch-all/
+      traefik.frontend.rule: HostRegexp:pihole.skylarker.org,{catchall:.*}
+      traefik.frontend.priority: 1
+      traefik.backend: pihole
+      traefik.port: 80
+      
+networks:
+  traefik:
+    driver: overlay
+    attachable: true
+    name: traefik
+    external: true
+  piholenet:
+    driver: overlay
+    attachable: true
+    name: piholenet
+    external: false
